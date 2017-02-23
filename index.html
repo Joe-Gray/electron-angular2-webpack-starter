@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Market Expansion</title>
+    <script>window.$ = window.jQuery = require('jquery');</script>   
+  </head>
+  <body>
+    <button id="home">Home</button>
+    <button id="manage-markets">Manage Markets</button>
+    <button id="admin">Admin</button>
+    <button id="settings">Settings</button>
+    <h1>Welcome </h1>
+    </br>
+
+    <button id="register">Register</button>
+    <button id="login">Login</button>
+    <button id="logout">Logout</button>
+    <!-- All of the Node.js APIs are available in this renderer process. -->
+<!--    We are using Node.js <script>document.write(process.versions.node)</script>,
+    Chromium <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>.-->
+  </body>
+
+  <script>
+    var http = require("./lib/http");
+    var currentUser = require("./lib/user");
+    //import { User } from "./lib/user"; 
+
+    $("#register").on("click", function(ev){http.Register();});
+    $("#login").on("click", function(ev){http.Login();});
+    $("#logout").on("click", function(ev){http.Logout();});
+  </script>
+</html>
