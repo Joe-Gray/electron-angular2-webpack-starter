@@ -1,3 +1,19 @@
-<p>
-  login works!
-</p>
+<div>
+  <h2>Login</h2>
+  <div class="container animated fadeIn">
+      <form class="form-horizontal" novalidate #form="ngForm">
+
+          <div class="form-group row">
+              <label class="control-label col-sm-2" for="frmEmail">Email</label>
+              <div class="col-sm-10">
+                  <input id="frmEmail" name="frmEmail" #frmEmail="ngModel" required type="email" 
+                          class="form-control" placeholder="Email" [(ngModel)]="email" />
+                  <div [hidden]="frmEmail.valid || frmEmail.pristine" class="alert alert-danger">
+                      Email is required
+                  </div>
+              </div>
+          </div>
+
+      </form>
+  </div>
+</div>
