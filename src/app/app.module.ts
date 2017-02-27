@@ -9,6 +9,10 @@ import { AboutComponent } from './about/about.component';
 import { ApiService } from './shared';
 import { routing } from './app.routing';
 
+import { AdminComponent } from './admin/admin.component';
+import { ManageMarketComponent } from './manage-market/manage-market.component';
+import { SettingsComponent } from './settings/settings.component';
+
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
 
 @NgModule({
@@ -21,7 +25,10 @@ import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
   declarations: [
     AppComponent,
     HomeComponent,
-    AboutComponent
+    AboutComponent,
+    AdminComponent,
+    ManageMarketComponent,
+    SettingsComponent
   ],
   providers: [
     ApiService
