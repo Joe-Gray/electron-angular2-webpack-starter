@@ -11,6 +11,7 @@ import { routing } from './app.routing';
 import { AdminComponent } from './admin/admin.component';
 import { ManageMarketComponent } from './manage-market/manage-market.component';
 import { SettingsComponent } from './settings/settings.component';
+import { LoginComponent } from './login/login.component';
 
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
 
@@ -26,7 +27,8 @@ import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
     HomeComponent,
     AdminComponent,
     ManageMarketComponent,
-    SettingsComponent
+    SettingsComponent,
+    LoginComponent
   ],
   providers: [
     ApiService

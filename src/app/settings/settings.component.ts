@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { remote } from 'electron';
 
 @Component({
-  selector: 'app-settings',
+  selector: 'me-settings',
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.css']
 })
@@ -13,8 +13,8 @@ export class SettingsComponent implements OnInit {
   ngOnInit() {
     console.log('Hello Settings');
     console.log(process.versions.electron);
-    var win = new remote.BrowserWindow({width: 300, height: 350});
-    win.loadURL("https://www.google.com");    
+    let win = new remote.BrowserWindow({width: 300, height: 350});
+    win.loadURL('https://www.google.com');
   }
 
 }
