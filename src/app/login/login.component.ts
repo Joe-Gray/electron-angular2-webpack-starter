@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AccountService } from '../shared/account.service';
+import { UserCredentials } from '../shared/user-credentials';
 
 @Component({
   selector: 'me-login',
@@ -7,12 +9,27 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoginComponent implements OnInit {
 
-  email: string;
-  password: string;
+  userCredentials: UserCredentials;
+  fieldWithFocus: any;
 
-  constructor() { }
+  constructor(private accountService: AccountService) {
+    this.userCredentials = new UserCredentials();
+  }
 
   ngOnInit() {
+  }
+
+  submit(): void {
+    this.accountService
+      .register(this.userCredentials)
+      .then(loginTokens => {
+        localStorage.setItem('accessToken', loginTokens.accessToken);
+        localStorage.setItem('refreshToken', loginTokens.refreshToken);
+    });
+  }
+
+  setFieldWithFocus(e): void {
+    this.fieldWithFocus = e.target.id;
   }
 
 }

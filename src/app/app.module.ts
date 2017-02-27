@@ -6,13 +6,16 @@ import { CustomFormsModule } from '../../node_modules/ng2-validation';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
-import { ApiService } from './shared';
 import { routing } from './app.routing';
 
 import { AdminComponent } from './admin/admin.component';
 import { ManageMarketComponent } from './manage-market/manage-market.component';
 import { SettingsComponent } from './settings/settings.component';
 import { LoginComponent } from './login/login.component';
+
+import { ApiService } from './shared';
+import { HttpService } from './shared';
+import { AccountService } from './shared';
 
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
 
@@ -33,7 +36,9 @@ import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
     LoginComponent
   ],
   providers: [
-    ApiService
+    ApiService,
+    HttpService,
+    AccountService
   ],
   bootstrap: [AppComponent]
 })
