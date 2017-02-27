@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { remote } from 'electron';
 
 @Component({
   selector: 'app-settings',
@@ -10,6 +11,10 @@ export class SettingsComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    console.log('Hello Settings');
+    console.log(process.versions.electron);
+    var win = new remote.BrowserWindow({width: 300, height: 350});
+    win.loadURL("https://www.google.com");    
   }
 
 }
