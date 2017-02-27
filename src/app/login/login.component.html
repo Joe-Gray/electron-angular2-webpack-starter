@@ -6,13 +6,24 @@
           <div class="form-group row">
               <label class="control-label col-sm-2" for="frmEmail">Email</label>
               <div class="col-sm-10">
-                  <input id="frmEmail" name="frmEmail" #frmEmail="ngModel" required type="email" 
+                  <input id="frmEmail" name="frmEmail" #frmEmail="ngModel" required email 
                           class="form-control" placeholder="Email" [(ngModel)]="email" />
-                  <div [hidden]="frmEmail.valid || frmEmail.pristine" class="alert alert-danger">
+                  <div [hidden]="(frmEmail.valid || frmEmail.pristine) && !frmEmail.errors?.email" class="alert alert-danger">
                       Email is required
                   </div>
               </div>
           </div>
+
+          <div class="form-group row">
+              <label class="control-label col-sm-2" for="frmPassword">Passworkd</label>
+              <div class="col-sm-10">
+                  <input id="frmPassword" name="frmPassword" #frmPassword="ngModel" required type="password" 
+                          class="form-control" placeholder="Password" [(ngModel)]="password" />
+                  <div [hidden]="frmPassword.valid || frmPassword.pristine" class="alert alert-danger">
+                      Password is required
+                  </div>
+              </div>
+          </div>          
 
       </form>
   </div>
