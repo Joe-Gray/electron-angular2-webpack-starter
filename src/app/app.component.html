@@ -4,7 +4,8 @@
     <a [routerLink]="['manage-market']">Manage Market</a>
     <a [routerLink]="['admin']">Admin</a>
     <a [routerLink]="['settings']">Settings</a>
-    <a [routerLink]="['login']">Login</a>
+    <a [routerLink]="['login']" *ngIf="!userIsLoggedIn">Login</a>
+    <a [routerLink]="['settings']" *ngIf="!!userIsLoggedIn">Logout</a>
   </nav>
 </header>
 <main>

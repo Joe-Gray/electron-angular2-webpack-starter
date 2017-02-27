@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 
 import { ApiService } from './shared';
+import { AccountService } from './shared/account.service';
 
 import '../style/app.scss';
 
@@ -15,11 +16,28 @@ export class AppComponent {
   nodeVersion: string;
   chromeVersion: string;
   electronVersion: string;
+  userIsLoggedIn: boolean;
 
-  constructor(private api: ApiService) {
+  constructor(private api: ApiService, private accountService: AccountService) {
+    this.accountService.loginAnnounced$.subscribe(message => {
+      console.log(message);
+      this.userIsLoggedIn = true;
+    });
+
+    this.accountService.logoutAnnounced$.subscribe(message => {
+      console.log(message);
+      this.userIsLoggedIn = false;
+    });
+
+    this.userIsLoggedIn = accountService.isUserLoggedIn();
     this.title = this.api.title;
     this.nodeVersion = this .api.nodeVersion;
     this.chromeVersion = this.api.chromeVersion;
     this.electronVersion = this.api.electronVersion;
   }
+
+  logout(): void {
+    console.log('clicked logout link');
+  }
+
 }

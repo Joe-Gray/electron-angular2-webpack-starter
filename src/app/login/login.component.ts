@@ -25,6 +25,7 @@ export class LoginComponent implements OnInit {
       .then(loginTokens => {
         localStorage.setItem('accessToken', loginTokens.accessToken);
         localStorage.setItem('refreshToken', loginTokens.refreshToken);
+        this.accountService.announceLogin('loggedIn');
     });
   }
 
