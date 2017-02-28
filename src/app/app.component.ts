@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 import { ApiService } from './shared';
 import { AccountService } from './shared/account.service';
+import { AuthenticationService } from './shared/authentication.service';
 
 import '../style/app.scss';
 
@@ -22,7 +23,10 @@ export class AppComponent {
   hasAdminClaim = false;
   hasAnyMarketClaim = false;
 
-  constructor(private api: ApiService, private accountService: AccountService) {
+  constructor(
+    private api: ApiService,
+    private accountService: AccountService,
+    private authenticationService: AuthenticationService) {
 
     this.accountService.loginAnnounced$.subscribe(message => {
       this.userIsLoggedIn = true;
@@ -57,6 +61,6 @@ export class AppComponent {
   }
 
   logout(): void {
-    this.accountService.logout();
+    this.authenticationService.logout();
   }
 }

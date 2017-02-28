@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AccountService } from '../shared/account.service';
+import { MarketService } from '../shared/market.service';
 
 @Component({
   selector: 'me-manage-market',
@@ -13,13 +14,36 @@ export class ManageMarketComponent implements OnInit {
   hasEditMarketClaim = false;
   hasViewMarketClaim = false;
 
-  constructor(private accountService: AccountService) {}
+  constructor(private marketService: MarketService,
+    private accountService: AccountService) {}
+
+  addMarket(): void {
+    this.marketService.add('');
+  }
+
+  editMarket(): void {
+    this.marketService.edit('');
+  }
+
+  deleteMarket(): void {
+    this.marketService.delete('');
+  }
+
+  viewMarket(): void {
+    this.marketService.get()
+      .then(response => response)
+      .catch(this.handleError);
+  }
+
+  private handleError(error: any): Promise<any> {
+    return Promise.reject(error.message || error);
+  }
 
   ngOnInit() {
     let accessPayload = this.accountService.accessTokenPayload;
-    this.hasAddMarketClaim = this.accountService.accessTokenPayload.userSecurityClaims.includes('AddMarket');
-    this.hasDeleteMarketClaim = this.accountService.accessTokenPayload.userSecurityClaims.includes('DeleteMarket');
-    this.hasEditMarketClaim = this.accountService.accessTokenPayload.userSecurityClaims.includes('EditMarket');
-    this.hasViewMarketClaim = this.accountService.accessTokenPayload.userSecurityClaims.includes('ViewMarket');
+    this.hasAddMarketClaim = true; // this.accountService.accessTokenPayload.userSecurityClaims.includes('AddMarket');
+    this.hasDeleteMarketClaim = true; // this.accountService.accessTokenPayload.userSecurityClaims.includes('DeleteMarket');
+    this.hasEditMarketClaim = true; // this.accountService.accessTokenPayload.userSecurityClaims.includes('EditMarket');
+    this.hasViewMarketClaim = true; // this.accountService.accessTokenPayload.userSecurityClaims.includes('ViewMarket');
   }
 }

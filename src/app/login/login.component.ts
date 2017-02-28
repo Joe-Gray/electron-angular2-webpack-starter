@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AccountService } from '../shared/account.service';
+import { AuthenticationService } from '../shared/authentication.service';
 import { UserCredentials } from '../shared/user-credentials';
 
 @Component({
@@ -13,7 +13,7 @@ export class LoginComponent implements OnInit {
   userCredentials: UserCredentials;
   fieldWithFocus: any;
 
-  constructor(private accountService: AccountService, private router: Router) {
+  constructor(private authenticationService: AuthenticationService, private router: Router) {
     this.userCredentials = new UserCredentials();
   }
 
@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
   }
 
   register(): void {
-    this.accountService
+    this.authenticationService
       .register(this.userCredentials)
       .then(loginTokens => {
         this.router.navigate(['']);
@@ -29,7 +29,7 @@ export class LoginComponent implements OnInit {
   }
 
   login(): void {
-    this.accountService
+    this.authenticationService
       .login(this.userCredentials)
       .then(loginTokens => {
         this.router.navigate(['']);

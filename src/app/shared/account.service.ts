@@ -10,7 +10,6 @@ import * as angular_jwt from 'angular2-jwt';
 @Injectable()
 export class AccountService {
 
-  private webApiUrl = 'https://localhost:44372/api/accounts';
   private _accessTokenPayload: JwtPayload;
   private _refreshTokenPayload: JwtPayload;
   private _marketClaims = ['Admin', 'AddMarket', 'DeleteMarket', 'EditMarket', 'ViewMarket'];
@@ -28,7 +27,7 @@ export class AccountService {
   refreshTokenChangeAnnounced$ = this.refreshTokenChangeAnnouncedSource.asObservable();
   accessTokenChangeAnnounced$ = this.accessTokenChangeAnnouncedSource.asObservable();
 
-  constructor(private httpService: HttpService) {
+  constructor() {
     let loginTokens = new LoginTokens();
     loginTokens.refreshToken = localStorage.getItem('refreshToken');
     loginTokens.accessToken = localStorage.getItem('accessToken');
@@ -54,35 +53,25 @@ export class AccountService {
     return this._isUserLoggedIn;
   }
 
-  register(userCredentials: UserCredentials): Promise<LoginTokens> {
-    return this.httpService.post<LoginTokens>(this.webApiUrl + '/register', userCredentials)
-      .then(loginTokens => {
-        this.setJwTokens(loginTokens);
-        this.announceRegister('registered');
-        this.announceLogin('loggedIn');
-        return loginTokens;
-      })
-      .catch(this.handleError);
+  register(loginTokens: LoginTokens): void {
+    this.login(loginTokens);
+    this.announceRegister('registered');
   }
 
-  login(userCredentials: UserCredentials): Promise<LoginTokens> {
-    return this.httpService.post<LoginTokens>(this.webApiUrl + '/login', userCredentials)
-      .then(loginTokens => {
-        this.setJwTokens(loginTokens);
-        this.announceLogin('loggedIn');
-        return loginTokens;
-      })
-      .catch(this.handleError);
+  login(loginTokens: LoginTokens): void {
+    this.setJwTokens(loginTokens);
+    this.announceLogin('loggedIn');
   }
 
-  logout(): void {
-    this.httpService.getText(this.webApiUrl + '/logout')
-      .then(response => {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        this.announceLogout(response);
-      })
-      .catch(this.handleError);
+  logout(message: string): void {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    this.announceLogout(message);
+  }
+
+  updateAccessToken(accessToken: string) {
+    localStorage.removeItem('accessToken');
+    this.setAccessToken(accessToken);
   }
 
   private announceRegister(message: string) {
@@ -106,16 +95,20 @@ export class AccountService {
   }
 
   private setJwTokens(loginTokens: LoginTokens) {
-      localStorage.setItem('accessToken', loginTokens.accessToken);
-      this._accessTokenPayload = jwt_decode(loginTokens.accessToken);
-      this.announceAccessTokenChange('updated');
-      localStorage.setItem('refreshToken', loginTokens.refreshToken);
-      this._refreshTokenPayload = jwt_decode(loginTokens.refreshToken);
-      this.announceRefreshTokenChange('updated');
+      this.setAccessToken(loginTokens.accessToken);
+      this.setRefreshToken(loginTokens.refreshToken);
       this._isUserLoggedIn = true;
   }
 
-  private handleError(error: any): Promise<any> {
-    return Promise.reject(error.message || error);
+  private setAccessToken(accessToken: string) {
+      localStorage.setItem('accessToken', accessToken);
+      this._accessTokenPayload = jwt_decode(accessToken);
+      this.announceAccessTokenChange('updated');
+  }
+
+  private setRefreshToken(refreshToken: string) {
+      localStorage.setItem('refreshToken', refreshToken);
+      this._refreshTokenPayload = jwt_decode(refreshToken);
+      this.announceRefreshTokenChange('updated');
   }
 }

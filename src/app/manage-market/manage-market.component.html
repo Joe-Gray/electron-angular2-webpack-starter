@@ -1,9 +1,9 @@
 <div>
   <h2>Manage Market</h2>
   <div>
-    <button type="button" class="btn btn-success" *ngIf="hasAddMarketClaim">Add Market</button>
-    <button type="button" class="btn btn-success" *ngIf="hasDeleteMarketClaim">Delete Market</button>
-    <button type="button" class="btn btn-success" *ngIf="hasEditMarketClaim">Edit Market</button>
-    <button type="button" class="btn btn-success" *ngIf="hasViewMarketClaim">View Market</button>
+    <button type="button" class="btn btn-success" (click)="addMarket()" *ngIf="hasAddMarketClaim">Add Market</button>
+    <button type="button" class="btn btn-success" (click)="deleteMarket()" *ngIf="hasDeleteMarketClaim">Delete Market</button>
+    <button type="button" class="btn btn-success" (click)="editMarket()" *ngIf="hasEditMarketClaim">Edit Market</button>
+    <button type="button" class="btn btn-success" (click)="viewMarket()" *ngIf="hasViewMarketClaim">View Market</button>
   </div>
 </div>

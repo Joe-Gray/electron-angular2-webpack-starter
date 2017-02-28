@@ -16,6 +16,8 @@ import { LoginComponent } from './login/login.component';
 import { ApiService } from './shared';
 import { HttpService } from './shared';
 import { AccountService } from './shared';
+import { MarketService } from './shared';
+import { AuthenticationService } from './shared';
 
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
 
@@ -38,7 +40,9 @@ import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
   providers: [
     ApiService,
     HttpService,
-    AccountService
+    AccountService,
+    MarketService,
+    AuthenticationService
   ],
   bootstrap: [AppComponent]
 })
