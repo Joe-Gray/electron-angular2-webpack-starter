@@ -1,5 +1,4 @@
-export class LoginTokens
-{
-	public accessToken: string;
-	public refreshToken: string;
+export class LoginTokens {
+  public accessToken: string;
+  public refreshToken: string;
 }

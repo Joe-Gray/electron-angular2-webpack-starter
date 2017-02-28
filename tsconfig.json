@@ -8,7 +8,7 @@
     "noEmitHelpers": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "lib": ["es2015", "dom"]
+    "lib": ["es2017", "dom"]
   },
   "compileOnSave": false,
   "buildOnSave": false,

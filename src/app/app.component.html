@@ -1,22 +1,17 @@
 <header>
   <nav>
     <a [routerLink]="['']">Home</a>
-    <a [routerLink]="['manage-market']">Manage Market</a>
-    <a [routerLink]="['admin']">Admin</a>
-    <a [routerLink]="['settings']">Settings</a>
+    <a [routerLink]="['manage-market']" *ngIf="hasAnyMarketClaim">Manage Market</a>
+    <a [routerLink]="['admin']" *ngIf="hasAdminClaim">Admin</a>
+    <a [routerLink]="['settings']" *ngIf="userIsLoggedIn">Settings</a>
     <a [routerLink]="['login']" *ngIf="!userIsLoggedIn">Login</a>
-    <a [routerLink]="['']" *ngIf="!!userIsLoggedIn" (click)="logout()">Logout [user email here]</a>
+    <a [routerLink]="['']" *ngIf="userIsLoggedIn" (click)="logout()">Logout {{userEmail}}</a>
   </nav>
 </header>
 <main>
-  <!-- Images (and assets) are parsed and loaded from within the public directory -->
-  <!--<img src="./img/angular.png">-->
-
   <router-outlet></router-outlet>
 </main>
-<footer>
-  <!--<a [href]="url">Webpack Angular 2 Starter</a>-->
-  
+<footer> 
     We are using Node.js {{nodeVersion}},
     Chromium {{chromeVersion}},
     and Electron {{electronVersion}}.    

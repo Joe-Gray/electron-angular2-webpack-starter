@@ -11,18 +11,48 @@ import * as angular_jwt from 'angular2-jwt';
 export class AccountService {
 
   private webApiUrl = 'https://localhost:44372/api/accounts';
-  private accessTokenPayload: JwtPayload;
-  private refreshTokenPayload: JwtPayload;
+  private _accessTokenPayload: JwtPayload;
+  private _refreshTokenPayload: JwtPayload;
+  private _marketClaims = ['Admin', 'AddMarket', 'DeleteMarket', 'EditMarket', 'ViewMarket'];
+  private _isUserLoggedIn = false;
 
   private registerAnnouncedSource = new Subject<string>();
   private loginAnnouncedSource = new Subject<string>();
   private logoutAnnouncedSource = new Subject<string>();
+  private refreshTokenChangeAnnouncedSource = new Subject<string>();
+  private accessTokenChangeAnnouncedSource = new Subject<string>();
 
   registerAnnounced$ = this.registerAnnouncedSource.asObservable();
   loginAnnounced$ = this.loginAnnouncedSource.asObservable();
   logoutAnnounced$ = this.logoutAnnouncedSource.asObservable();
+  refreshTokenChangeAnnounced$ = this.refreshTokenChangeAnnouncedSource.asObservable();
+  accessTokenChangeAnnounced$ = this.accessTokenChangeAnnouncedSource.asObservable();
 
-  constructor(private httpService: HttpService) { }
+  constructor(private httpService: HttpService) {
+    let loginTokens = new LoginTokens();
+    loginTokens.refreshToken = localStorage.getItem('refreshToken');
+    loginTokens.accessToken = localStorage.getItem('accessToken');
+
+    if (loginTokens.refreshToken && loginTokens.accessToken) {
+      this.setJwTokens(loginTokens);
+    }
+  }
+
+  get marketClaims(): string[] {
+    return this._marketClaims;
+  }
+
+  get accessTokenPayload(): JwtPayload {
+    return this._accessTokenPayload;
+  }
+
+  get refreshTokenPayload(): JwtPayload {
+    return this._refreshTokenPayload;
+  }
+
+  get isUserLoggedIn(): boolean {
+    return this._isUserLoggedIn;
+  }
 
   register(userCredentials: UserCredentials): Promise<LoginTokens> {
     return this.httpService.post<LoginTokens>(this.webApiUrl + '/register', userCredentials)
@@ -54,16 +84,6 @@ export class AccountService {
       .catch(this.handleError);
   }
 
-  isUserLoggedIn(): boolean {
-    let refreshToken = localStorage.getItem('refreshToken');
-
-    if (refreshToken) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   private announceRegister(message: string) {
     this.registerAnnouncedSource.next(message);
   }
@@ -76,19 +96,22 @@ export class AccountService {
     this.logoutAnnouncedSource.next(message);
   }
 
-  private setJwTokens(loginTokens: LoginTokens) {
-      localStorage.setItem('accessToken', loginTokens.accessToken);
-      localStorage.setItem('refreshToken', loginTokens.refreshToken);
-      this.setJwtPayload(loginTokens.accessToken);
-      this.setJwtPayload(loginTokens.refreshToken);
+  private announceRefreshTokenChange(message: string) {
+    this.refreshTokenChangeAnnouncedSource.next(message);
   }
 
-  private setJwtPayload(payload: string) {
-    let jwtPayload = jwt_decode(payload);
-    console.log(jwtPayload);
-    let jwtHelper = new angular_jwt.JwtHelper();
-    let pay = jwtHelper.decodeToken(payload);
-    console.log(pay);
+  private announceAccessTokenChange(message: string) {
+    this.accessTokenChangeAnnouncedSource.next(message);
+  }
+
+  private setJwTokens(loginTokens: LoginTokens) {
+      localStorage.setItem('accessToken', loginTokens.accessToken);
+      this._accessTokenPayload = jwt_decode(loginTokens.accessToken);
+      this.announceAccessTokenChange('updated');
+      localStorage.setItem('refreshToken', loginTokens.refreshToken);
+      this._refreshTokenPayload = jwt_decode(loginTokens.refreshToken);
+      this.announceRefreshTokenChange('updated');
+      this._isUserLoggedIn = true;
   }
 
   private handleError(error: any): Promise<any> {
