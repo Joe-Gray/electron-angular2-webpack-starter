@@ -8,7 +8,7 @@
               <div class="col-sm-10">
                   <input id="frmEmail" name="frmEmail" #frmEmail="ngModel" required email 
                           class="form-control" placeholder="Email" [(ngModel)]="userCredentials.email" (focus)="setFieldWithFocus($event)" />
-                  <div [hidden]="(frmEmail.valid || frmEmail.pristine) && !frmEmail.errors?.email" class="alert alert-danger">
+                  <div [hidden]="frmEmail.valid || frmEmail.pristine || fieldWithFocus==frmEmail.name || !frmEmail.errors?.email" class="alert alert-danger">
                       Email is required
                   </div>
               </div>
@@ -18,14 +18,14 @@
               <label class="control-label col-sm-2" for="frmPassword">Passworkd</label>
               <div class="col-sm-10">
                   <input id="frmPassword" name="frmPassword" #frmPassword="ngModel" required type="password" 
-                          class="form-control" placeholder="Password" [(ngModel)]="userCredentials.password" />
+                          class="form-control" placeholder="Password" [(ngModel)]="userCredentials.password" (focus)="setFieldWithFocus($event)" />
                   <div [hidden]="frmPassword.valid || frmPassword.pristine" class="alert alert-danger">
                       Password is required
                   </div>
               </div>
           </div>
 
-          <button type="button" class="btn btn-success" (click)="submit()">Submit</button>        
+          <button type="button" class="btn btn-success" (click)="register()">Register</button>        
 
       </form>
   </div>

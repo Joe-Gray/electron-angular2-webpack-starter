@@ -20,12 +20,10 @@ export class AppComponent {
 
   constructor(private api: ApiService, private accountService: AccountService) {
     this.accountService.loginAnnounced$.subscribe(message => {
-      console.log(message);
       this.userIsLoggedIn = true;
     });
 
     this.accountService.logoutAnnounced$.subscribe(message => {
-      console.log(message);
       this.userIsLoggedIn = false;
     });
 
@@ -37,7 +35,6 @@ export class AppComponent {
   }
 
   logout(): void {
-    console.log('clicked logout link');
     this.accountService.logout();
   }
 

@@ -5,7 +5,7 @@
     <a [routerLink]="['admin']">Admin</a>
     <a [routerLink]="['settings']">Settings</a>
     <a [routerLink]="['login']" *ngIf="!userIsLoggedIn">Login</a>
-    <a [routerLink]="['']" *ngIf="!!userIsLoggedIn" (click)="logout()">Logout</a>
+    <a [routerLink]="['']" *ngIf="!!userIsLoggedIn" (click)="logout()">Logout [user email here]</a>
   </nav>
 </header>
 <main>

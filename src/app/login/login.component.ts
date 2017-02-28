@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AccountService } from '../shared/account.service';
 import { UserCredentials } from '../shared/user-credentials';
 
@@ -12,25 +13,23 @@ export class LoginComponent implements OnInit {
   userCredentials: UserCredentials;
   fieldWithFocus: any;
 
-  constructor(private accountService: AccountService) {
+  constructor(private accountService: AccountService, private router: Router) {
     this.userCredentials = new UserCredentials();
   }
 
   ngOnInit() {
   }
 
-  submit(): void {
+  register(): void {
     this.accountService
       .register(this.userCredentials)
       .then(loginTokens => {
-        localStorage.setItem('accessToken', loginTokens.accessToken);
-        localStorage.setItem('refreshToken', loginTokens.refreshToken);
-        this.accountService.announceLogin('loggedIn');
+        this.router.navigate(['']);
     });
   }
 
   setFieldWithFocus(e): void {
-    this.fieldWithFocus = e.target.id;
+    this.fieldWithFocus = e.target.name;
   }
 
 }

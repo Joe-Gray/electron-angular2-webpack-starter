@@ -3,6 +3,9 @@ import { HttpService } from './http.service';
 import { LoginTokens } from './login-tokens';
 import { UserCredentials } from './user-credentials';
 import { Subject }    from 'rxjs/Subject';
+import { JwtPayload } from './jwt-payload';
+import * as jwt_decode from 'jwt-decode';
+import * as angular_jwt from 'angular2-jwt';
 
 @Injectable()
 export class AccountService {
@@ -14,11 +17,21 @@ export class AccountService {
   loginAnnounced$ = this.loginAnnouncedSource.asObservable();
   logoutAnnounced$ = this.logoutAnnouncedSource.asObservable();
 
+  accessTokenPayload: JwtPayload;
+  refreshTokenPayload: JwtPayload;
+
   constructor(private httpService: HttpService) { }
 
   register(userCredentials: UserCredentials): Promise<LoginTokens> {
     return this.httpService.post<LoginTokens>(this.webApiUrl + '/register', userCredentials)
-      .then(response => response)
+      .then(loginTokens => {
+        localStorage.setItem('accessToken', loginTokens.accessToken);
+        localStorage.setItem('refreshToken', loginTokens.refreshToken);
+        this.setJwtPayload(loginTokens.accessToken);
+        this.setJwtPayload(loginTokens.refreshToken);
+        this.announceLogin('loggedIn');
+        return loginTokens;
+      })
       .catch(this.handleError);
   }
 
@@ -48,6 +61,14 @@ export class AccountService {
 
   announceLogout(message: string) {
     this.logoutAnnouncedSource.next(message);
+  }
+
+  private setJwtPayload(payload: string) {
+    let jwtPayload = jwt_decode(payload);
+    console.log(jwtPayload);
+    let jwtHelper = new angular_jwt.JwtHelper();
+    let pay = jwtHelper.decodeToken(payload);
+    console.log(pay);
   }
 
   private handleError(error: any): Promise<any> {
