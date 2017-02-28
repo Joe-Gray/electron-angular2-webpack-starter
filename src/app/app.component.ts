@@ -38,6 +38,7 @@ export class AppComponent {
 
   logout(): void {
     console.log('clicked logout link');
+    this.accountService.logout();
   }
 
 }

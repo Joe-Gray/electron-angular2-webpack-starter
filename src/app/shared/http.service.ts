@@ -7,10 +7,17 @@ import 'rxjs/add/operator/toPromise';
 export class HttpService {
     constructor(private http: Http) { }
 
-    public get<T>(url: string): Promise<T> {
+    public getJson<T>(url: string): Promise<T> {
         return this.http.get(url, { headers: this.getStandardHeaders() })
             .toPromise()
             .then(response => response.json())
+            .catch(this.handleError);
+    }
+
+    public getText(url: string): Promise<string> {
+        return this.http.get(url, { headers: this.getStandardHeaders() })
+            .toPromise()
+            .then(response => response.text())
             .catch(this.handleError);
     }
 

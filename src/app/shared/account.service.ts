@@ -22,6 +22,16 @@ export class AccountService {
       .catch(this.handleError);
   }
 
+  logout(): void {
+    this.httpService.getText(this.webApiUrl + '/logout')
+      .then(response => {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        this.announceLogout(response);
+      })
+      .catch(this.handleError);
+  }
+
   isUserLoggedIn(): boolean {
     let refreshToken = localStorage.getItem('refreshToken');
 
