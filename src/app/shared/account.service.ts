@@ -59,6 +59,7 @@ export class AccountService {
       .then(loginTokens => {
         this.setJwTokens(loginTokens);
         this.announceRegister('registered');
+        this.announceLogin('loggedIn');
         return loginTokens;
       })
       .catch(this.handleError);
