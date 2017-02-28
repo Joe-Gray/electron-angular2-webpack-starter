@@ -11,24 +11,33 @@ import * as angular_jwt from 'angular2-jwt';
 export class AccountService {
 
   private webApiUrl = 'https://localhost:44372/api/accounts';
+  private accessTokenPayload: JwtPayload;
+  private refreshTokenPayload: JwtPayload;
+
+  private registerAnnouncedSource = new Subject<string>();
   private loginAnnouncedSource = new Subject<string>();
   private logoutAnnouncedSource = new Subject<string>();
 
+  registerAnnounced$ = this.registerAnnouncedSource.asObservable();
   loginAnnounced$ = this.loginAnnouncedSource.asObservable();
   logoutAnnounced$ = this.logoutAnnouncedSource.asObservable();
-
-  accessTokenPayload: JwtPayload;
-  refreshTokenPayload: JwtPayload;
 
   constructor(private httpService: HttpService) { }
 
   register(userCredentials: UserCredentials): Promise<LoginTokens> {
     return this.httpService.post<LoginTokens>(this.webApiUrl + '/register', userCredentials)
       .then(loginTokens => {
-        localStorage.setItem('accessToken', loginTokens.accessToken);
-        localStorage.setItem('refreshToken', loginTokens.refreshToken);
-        this.setJwtPayload(loginTokens.accessToken);
-        this.setJwtPayload(loginTokens.refreshToken);
+        this.setJwTokens(loginTokens);
+        this.announceRegister('registered');
+        return loginTokens;
+      })
+      .catch(this.handleError);
+  }
+
+  login(userCredentials: UserCredentials): Promise<LoginTokens> {
+    return this.httpService.post<LoginTokens>(this.webApiUrl + '/login', userCredentials)
+      .then(loginTokens => {
+        this.setJwTokens(loginTokens);
         this.announceLogin('loggedIn');
         return loginTokens;
       })
@@ -55,12 +64,23 @@ export class AccountService {
     }
   }
 
-  announceLogin(message: string) {
+  private announceRegister(message: string) {
+    this.registerAnnouncedSource.next(message);
+  }
+
+  private announceLogin(message: string) {
     this.loginAnnouncedSource.next(message);
   }
 
-  announceLogout(message: string) {
+  private announceLogout(message: string) {
     this.logoutAnnouncedSource.next(message);
+  }
+
+  private setJwTokens(loginTokens: LoginTokens) {
+      localStorage.setItem('accessToken', loginTokens.accessToken);
+      localStorage.setItem('refreshToken', loginTokens.refreshToken);
+      this.setJwtPayload(loginTokens.accessToken);
+      this.setJwtPayload(loginTokens.refreshToken);
   }
 
   private setJwtPayload(payload: string) {

@@ -28,6 +28,14 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  login(): void {
+    this.accountService
+      .login(this.userCredentials)
+      .then(loginTokens => {
+        this.router.navigate(['']);
+    });
+  }
+
   setFieldWithFocus(e): void {
     this.fieldWithFocus = e.target.name;
   }
