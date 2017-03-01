@@ -11,15 +11,15 @@ export class HttpService {
     
     constructor(private http: Http, private accountService: AccountService) { }  
 
-    public getJson<T>(url: string): Promise<T> {
+    public get(url: string): Promise<Response> {
         return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
-            .then(response => response.json())
+            .then(response => response)
             .catch(error => {
                 let errorJson = error.json();
                         
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
-                    return this._refreshAccessTokenAndRetryGetJson(url)
+                    return this._refreshAccessTokenAndRetryGet(url)
                         .then(innerResponse => innerResponse)
                         .catch(innerError => this.handleError(innerError));
                 } else {
@@ -28,25 +28,38 @@ export class HttpService {
             });
     }
 
-    public getText(url: string): Promise<string> {
-        return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
-            .toPromise()
-            .then(response => response.text())
-            .catch(error => this.handleError(error));
-    }
-
-    public post<T>(url: string, data: any): Promise<T> {
+    public post(url: string, data: any): Promise<Response> {
         return this.http.post(url, data, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
-            .then(response => response.json())
-            .catch(error => this.handleError(error));
+            .then(response => response)
+            .catch(error => {
+                let errorJson = error.json();
+                        
+                if (errorJson && errorJson.errorCode === 'TokenExpired') {
+                    return this._refreshAccessTokenAndRetryPost(url, data)
+                        .then(innerResponse => innerResponse)
+                        .catch(innerError => this.handleError(innerError));
+                } else {
+                    this.handleError(error);
+                }
+            });
     }
 
-    public delete(url: string): Promise<string> {
+    public delete(url: string): Promise<Response> {
         return this.http.delete(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
-            .then(response => response.text())
-            .catch(error => this.handleError(error));
+            .then(response => response)
+            .catch(error => {
+                let errorJson = error.json();
+                        
+                if (errorJson && errorJson.errorCode === 'TokenExpired') {
+                    return this._refreshAccessTokenAndRetryDelete(url)
+                        .then(innerResponse => innerResponse)
+                        .catch(innerError => this.handleError(innerError));
+                } else {
+                    this.handleError(error);
+                }
+            });
     }
 
     private getStandardHeaders(token: string): Headers {
@@ -82,25 +95,69 @@ export class HttpService {
         return Promise.reject(error);
     }
 
-    private _retryGetJson<T>(url: string): Promise<T> {
-        return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
-            .toPromise()
-            .then(response => response.json())
-            .catch(error => this.handleError(error));
-    }
-
-    private _refreshAccessTokenAndRetryGetJson(url: string): Promise<Response> {
+    private _refreshAccessTokenAndRetryGet(url: string): Promise<Response> {
         return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
             .toPromise()
             .then(response => {
                 let accessToken = response.json();
                 this.accountService.updateAccessToken(accessToken.token);
 
-                return this._retryGetJson(url)
+                return this._retryGet(url)
                     .then(innerResponse => innerResponse)
                     .catch(innerError => this.handleError(innerError));                
 
             })
             .catch(error => this.handleError(error));
     }
+
+    private _retryGet(url: string): Promise<Response> {
+        return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
+            .toPromise()
+            .then(response => response)
+            .catch(error => this.handleError(error));
+    }
+
+    private _refreshAccessTokenAndRetryPost(url: string, data: any): Promise<Response> {
+        return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
+            .toPromise()
+            .then(response => {
+                let accessToken = response.json();
+                this.accountService.updateAccessToken(accessToken.token);
+
+                return this._retryPost(url, data)
+                    .then(innerResponse => innerResponse)
+                    .catch(innerError => this.handleError(innerError));                
+
+            })
+            .catch(error => this.handleError(error));
+    }    
+
+    private _retryPost(url: string, data: any): Promise<Response> {
+        return this.http.post(url, data, { headers: this.getStandardHeaders('accessToken') })
+            .toPromise()
+            .then(response => response)
+            .catch(error => this.handleError(error));
+    }
+
+    private _refreshAccessTokenAndRetryDelete(url: string): Promise<Response> {
+        return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
+            .toPromise()
+            .then(response => {
+                let accessToken = response.json();
+                this.accountService.updateAccessToken(accessToken.token);
+
+                return this._retryDelete(url)
+                    .then(innerResponse => innerResponse)
+                    .catch(innerError => this.handleError(innerError));                
+
+            })
+            .catch(error => this.handleError(error));
+    }
+
+    private _retryDelete(url: string): Promise<Response> {
+        return this.http.delete(url, { headers: this.getStandardHeaders('accessToken') })
+            .toPromise()
+            .then(response => response)
+            .catch(error => this.handleError(error));
+    }      
 }

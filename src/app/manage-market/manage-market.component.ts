@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Response } from '@angular/http';
 import { AccountService } from '../shared/account.service';
 import { MarketService } from '../shared/market.service';
 
@@ -18,21 +19,33 @@ export class ManageMarketComponent implements OnInit {
     private accountService: AccountService) {}
 
   addMarket(): void {
-    this.marketService.add('');
+    this.marketService.add('')
+      .then(response => {
+        alert(response.json().message);
+      })
+      .catch(this.handleError);
   }
 
   editMarket(): void {
-    this.marketService.edit('');
+    this.marketService.edit('')
+      .then(response => {
+        alert(response.json().message);
+      })
+      .catch(this.handleError);    
   }
 
   deleteMarket(): void {
-    this.marketService.delete('');
+    this.marketService.delete('')
+      .then(response => {
+        alert(response.json().message);
+      })
+      .catch(this.handleError);    
   }
 
   viewMarket(): void {
     this.marketService.get()
       .then(response => {
-        alert(response.message);
+        alert(response.json().message);
       })
       .catch(this.handleError);
   }

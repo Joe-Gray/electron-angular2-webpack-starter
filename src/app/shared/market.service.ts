@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Response } from '@angular/http';
 import { HttpService } from './http.service';
 
 @Injectable()
@@ -9,26 +10,26 @@ export class MarketService {
   constructor(private httpService: HttpService) {
   }
 
-  get(): Promise<any> {
-    return this.httpService.getJson<any>(this.webApiUrl + '/view')
+  get(): Promise<Response> {
+    return this.httpService.get(this.webApiUrl + '/view')
       .then(response => response)
       .catch(this.handleError);
   }
 
-  add(market: any): void {
-    this.httpService.post(this.webApiUrl + '/add', market)
+  add(market: any): Promise<Response> {
+    return this.httpService.post(this.webApiUrl + '/add', market)
       .then(response => response)
       .catch(this.handleError);
   }
 
-  edit(market: any): void {
-    this.httpService.post(this.webApiUrl + '/edit', market)
+  edit(market: any): Promise<Response> {
+    return this.httpService.post(this.webApiUrl + '/edit', market)
       .then(response => response)
       .catch(this.handleError);
   }
 
-  delete(market: any): void {
-    this.httpService.delete(this.webApiUrl + '/delete')
+  delete(market: any): Promise<Response> {
+    return this.httpService.delete(this.webApiUrl + '/delete')
       .then(response => response)
       .catch(this.handleError);
   }

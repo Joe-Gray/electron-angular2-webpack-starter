@@ -13,8 +13,9 @@ export class AuthenticationService {
   }
 
   register(userCredentials: UserCredentials): Promise<LoginTokens> {
-    return this.httpService.post<LoginTokens>(this.webApiUrl + '/register', userCredentials)
-      .then(loginTokens => {
+    return this.httpService.post(this.webApiUrl + '/register', userCredentials)
+      .then(response => {
+        let loginTokens = response.json();
         this.accountService.register(loginTokens);
         return loginTokens;
       })
@@ -22,8 +23,9 @@ export class AuthenticationService {
   }
 
   login(userCredentials: UserCredentials): Promise<LoginTokens> {
-    return this.httpService.post<LoginTokens>(this.webApiUrl + '/login', userCredentials)
-      .then(loginTokens => {
+    return this.httpService.post(this.webApiUrl + '/login', userCredentials)
+      .then(response => {
+        let loginTokens = response.json();
         this.accountService.login(loginTokens);
         return loginTokens;
       })
@@ -31,16 +33,17 @@ export class AuthenticationService {
   }
 
   logout(): void {
-    this.httpService.getText(this.webApiUrl + '/logout')
+    this.httpService.get(this.webApiUrl + '/logout')
       .then(response => {
-        this.accountService.logout(response);
+        this.accountService.logout(response.text());
       })
       .catch(this.handleError);
   }
 
   getAccessToken(): Promise<LoginTokens> {
-    return this.httpService.getJson<LoginTokens>(this.webApiUrl + '/getAccessToken')
-      .then(loginTokens => {
+    return this.httpService.get(this.webApiUrl + '/getAccessToken')
+      .then(response => {
+        let loginTokens = response.json();
         this.accountService.updateAccessToken(loginTokens.accessToken);
         return loginTokens;
       })
