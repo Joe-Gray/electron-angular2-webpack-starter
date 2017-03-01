@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-
+import { Router } from '@angular/router';
 import { ApiService } from './shared';
 import { AccountService } from './shared/account.service';
 import { AuthenticationService } from './shared/authentication.service';
-
 import '../style/app.scss';
 
 @Component({
@@ -26,7 +25,8 @@ export class AppComponent {
   constructor(
     private api: ApiService,
     private accountService: AccountService,
-    private authenticationService: AuthenticationService) {
+    private authenticationService: AuthenticationService,
+    private router: Router) {
 
     this.accountService.loginAnnounced$.subscribe(message => {
       this.userIsLoggedIn = true;
@@ -38,7 +38,12 @@ export class AppComponent {
       this.userEmail = null;
       this.hasAdminClaim = false;
       this.hasAnyMarketClaim = false;
+      this.router.navigate(['login']);
     });
+
+    if (accountService.isRefreshTokenExpired()) {
+      this.logout();
+    }
 
     this.userIsLoggedIn = accountService.isUserLoggedIn;
 

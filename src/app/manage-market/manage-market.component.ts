@@ -31,7 +31,7 @@ export class ManageMarketComponent implements OnInit {
       .then(response => {
         alert(response.json().message);
       })
-      .catch(this.handleError);    
+      .catch(this.handleError);
   }
 
   deleteMarket(): void {
@@ -39,7 +39,7 @@ export class ManageMarketComponent implements OnInit {
       .then(response => {
         alert(response.json().message);
       })
-      .catch(this.handleError);    
+      .catch(this.handleError);
   }
 
   viewMarket(): void {

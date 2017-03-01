@@ -1,15 +1,18 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { Subject }    from 'rxjs/Subject';
+import * as jwt_decode from 'jwt-decode';
+import * as angular_jwt from 'angular2-jwt';
 import { HttpService } from './http.service';
 import { LoginTokens } from './login-tokens';
 import { UserCredentials } from './user-credentials';
-import { Subject }    from 'rxjs/Subject';
 import { JwtPayload } from './jwt-payload';
-import * as jwt_decode from 'jwt-decode';
-import * as angular_jwt from 'angular2-jwt';
 
 @Injectable()
 export class AccountService {
 
+  private accessToken: string;
+  private refreshToken: string;
   private _accessTokenPayload: JwtPayload;
   private _refreshTokenPayload: JwtPayload;
   private _marketClaims = ['Admin', 'AddMarket', 'DeleteMarket', 'EditMarket', 'ViewMarket'];
@@ -21,57 +24,66 @@ export class AccountService {
   private refreshTokenChangeAnnouncedSource = new Subject<string>();
   private accessTokenChangeAnnouncedSource = new Subject<string>();
 
-  registerAnnounced$ = this.registerAnnouncedSource.asObservable();
-  loginAnnounced$ = this.loginAnnouncedSource.asObservable();
-  logoutAnnounced$ = this.logoutAnnouncedSource.asObservable();
-  refreshTokenChangeAnnounced$ = this.refreshTokenChangeAnnouncedSource.asObservable();
-  accessTokenChangeAnnounced$ = this.accessTokenChangeAnnouncedSource.asObservable();
+  public registerAnnounced$ = this.registerAnnouncedSource.asObservable();
+  public loginAnnounced$ = this.loginAnnouncedSource.asObservable();
+  public logoutAnnounced$ = this.logoutAnnouncedSource.asObservable();
+  public refreshTokenChangeAnnounced$ = this.refreshTokenChangeAnnouncedSource.asObservable();
+  public accessTokenChangeAnnounced$ = this.accessTokenChangeAnnouncedSource.asObservable();
 
-  constructor() {
-    let loginTokens = new LoginTokens();
-    loginTokens.refreshToken = localStorage.getItem('refreshToken');
-    loginTokens.accessToken = localStorage.getItem('accessToken');
-
-    if (loginTokens.refreshToken && loginTokens.accessToken) {
-      this.setJwTokens(loginTokens);
-    }
+  constructor(private router: Router) {
+    this.setJwTokensFromLocalStorage();
   }
 
-  get marketClaims(): string[] {
+  public get marketClaims(): string[] {
     return this._marketClaims;
   }
 
-  get accessTokenPayload(): JwtPayload {
+  public get accessTokenPayload(): JwtPayload {
     return this._accessTokenPayload;
   }
 
-  get refreshTokenPayload(): JwtPayload {
+  public get refreshTokenPayload(): JwtPayload {
     return this._refreshTokenPayload;
   }
 
-  get isUserLoggedIn(): boolean {
+  public get isUserLoggedIn(): boolean {
     return this._isUserLoggedIn;
   }
 
-  register(loginTokens: LoginTokens): void {
+  public register(loginTokens: LoginTokens): void {
     this.login(loginTokens);
     this.announceRegister('registered');
   }
 
-  login(loginTokens: LoginTokens): void {
+  public login(loginTokens: LoginTokens): void {
     this.setJwTokens(loginTokens);
     this.announceLogin('loggedIn');
   }
 
-  logout(message: string): void {
+  public logout(message: string): void {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     this.announceLogout(message);
   }
 
-  updateAccessToken(accessToken: string) {
+  public updateAccessToken(accessToken: string) {
     localStorage.removeItem('accessToken');
     this.setAccessToken(accessToken);
+  }
+
+  public isRefreshTokenExpired() {
+    if (!this.refreshToken) {
+      return false;
+    }
+
+    let isTokenExpired = this.isTokenExpired(this.refreshToken);
+    return isTokenExpired;
+  }
+
+  private isTokenExpired(token: string) {
+    let jwtHelper = new angular_jwt.JwtHelper();
+    let isTokenExpired = jwtHelper.isTokenExpired(token);
+    return isTokenExpired;
   }
 
   private announceRegister(message: string) {
@@ -94,10 +106,25 @@ export class AccountService {
     this.accessTokenChangeAnnouncedSource.next(message);
   }
 
+  private setJwTokensFromLocalStorage() {
+    this.refreshToken = localStorage.getItem('refreshToken');
+    this.accessToken = localStorage.getItem('accessToken');
+
+    if (this.accessToken && this.refreshToken) {
+      this._refreshTokenPayload = jwt_decode(this.refreshToken);
+      this.announceRefreshTokenChange('updated');
+      this._accessTokenPayload = jwt_decode(this.accessToken);
+      this.announceAccessTokenChange('updated');
+      this._isUserLoggedIn = true;
+    }
+  }
+
   private setJwTokens(loginTokens: LoginTokens) {
+    if (loginTokens.accessToken && loginTokens.refreshToken) {
       this.setAccessToken(loginTokens.accessToken);
       this.setRefreshToken(loginTokens.refreshToken);
       this._isUserLoggedIn = true;
+    }
   }
 
   private setAccessToken(accessToken: string) {

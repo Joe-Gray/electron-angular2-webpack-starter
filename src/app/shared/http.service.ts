@@ -8,8 +8,12 @@ import { AccountService } from './account.service';
 export class HttpService {
 
     private urlToRefreshToken = 'https://localhost:44372/api/accounts/getAccessToken';
-    
-    constructor(private http: Http, private accountService: AccountService) { }  
+
+    private refreshTokenExpiredAnnouncedSource = new Subject<string>();
+
+    public refreshTokenExpiredAnnounced$ = this.refreshTokenExpiredAnnouncedSource.asObservable();
+
+    constructor(private http: Http, private accountService: AccountService) { }
 
     public get(url: string): Promise<Response> {
         return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
@@ -17,7 +21,7 @@ export class HttpService {
             .then(response => response)
             .catch(error => {
                 let errorJson = error.json();
-                        
+
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
                     return this._refreshAccessTokenAndRetryGet(url)
                         .then(innerResponse => innerResponse)
@@ -34,7 +38,7 @@ export class HttpService {
             .then(response => response)
             .catch(error => {
                 let errorJson = error.json();
-                        
+
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
                     return this._refreshAccessTokenAndRetryPost(url, data)
                         .then(innerResponse => innerResponse)
@@ -51,7 +55,7 @@ export class HttpService {
             .then(response => response)
             .catch(error => {
                 let errorJson = error.json();
-                        
+
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
                     return this._refreshAccessTokenAndRetryDelete(url)
                         .then(innerResponse => innerResponse)
@@ -104,10 +108,19 @@ export class HttpService {
 
                 return this._retryGet(url)
                     .then(innerResponse => innerResponse)
-                    .catch(innerError => this.handleError(innerError));                
+                    .catch(innerError => this.handleError(innerError));
 
             })
-            .catch(error => this.handleError(error));
+            .catch(error => {
+                let errorJson = error.json();
+
+                if (errorJson && errorJson.errorCode === 'TokenExpired') {
+                    this.announceRefreshTokenExpired('expired');
+                    this.handleError(error);
+                } else {
+                    this.handleError(error);
+                }
+            });
     }
 
     private _retryGet(url: string): Promise<Response> {
@@ -126,11 +139,11 @@ export class HttpService {
 
                 return this._retryPost(url, data)
                     .then(innerResponse => innerResponse)
-                    .catch(innerError => this.handleError(innerError));                
+                    .catch(innerError => this.handleError(innerError));
 
             })
             .catch(error => this.handleError(error));
-    }    
+    }
 
     private _retryPost(url: string, data: any): Promise<Response> {
         return this.http.post(url, data, { headers: this.getStandardHeaders('accessToken') })
@@ -148,7 +161,7 @@ export class HttpService {
 
                 return this._retryDelete(url)
                     .then(innerResponse => innerResponse)
-                    .catch(innerError => this.handleError(innerError));                
+                    .catch(innerError => this.handleError(innerError));
 
             })
             .catch(error => this.handleError(error));
@@ -159,5 +172,9 @@ export class HttpService {
             .toPromise()
             .then(response => response)
             .catch(error => this.handleError(error));
-    }      
+    }
+
+    private announceRefreshTokenExpired(message: string) {
+        this.refreshTokenExpiredAnnouncedSource.next(message);
+    }
 }

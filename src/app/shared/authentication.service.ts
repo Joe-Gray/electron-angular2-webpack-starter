@@ -10,6 +10,11 @@ export class AuthenticationService {
   private webApiUrl = 'https://localhost:44372/api/accounts';
 
   constructor(private httpService: HttpService, private accountService: AccountService) {
+
+    this.httpService.refreshTokenExpiredAnnounced$.subscribe(message => {
+      this.logout();
+    });
+
   }
 
   register(userCredentials: UserCredentials): Promise<LoginTokens> {
@@ -37,7 +42,10 @@ export class AuthenticationService {
       .then(response => {
         this.accountService.logout(response.text());
       })
-      .catch(this.handleError);
+      .catch(error => {
+        this.accountService.logout('');
+        this.handleError(error);
+      });
   }
 
   getAccessToken(): Promise<LoginTokens> {
