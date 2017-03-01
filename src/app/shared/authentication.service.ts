@@ -10,10 +10,6 @@ export class AuthenticationService {
   private webApiUrl = 'https://localhost:44372/api/accounts';
 
   constructor(private httpService: HttpService, private accountService: AccountService) {
-
-    this.httpService.tokenExpiredAnnounced$.subscribe(message => {
-      this.getAccessToken();
-    });
   }
 
   register(userCredentials: UserCredentials): Promise<LoginTokens> {

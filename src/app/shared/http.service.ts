@@ -8,56 +8,20 @@ import { AccountService } from './account.service';
 export class HttpService {
 
     private urlToRefreshToken = 'https://localhost:44372/api/accounts/getAccessToken';
-    private tokenExpiredAnnouncedSource = new Subject<string>();
-
-    tokenExpiredAnnounced$ = this.tokenExpiredAnnouncedSource.asObservable();
-
-    constructor(private http: Http, private accountService: AccountService) { }
-
-    private refreshAccessTokenAndTryGetAgain() {
-
-    }
-
-    private _getJson<T>(url: string): Promise<T> {
-        return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
-            .toPromise()
-            .then(response => response.json())
-            .catch(error => this.handleError(error));
-    }
-
-    private _refreshAccessTokenAndRetryGetJson<T>(url: string): Promise<T> {
-        return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
-            .toPromise()
-            .then(response => response.json())
-            .catch(error => this.handleError(error));
-    }    
+    
+    constructor(private http: Http, private accountService: AccountService) { }  
 
     public getJson<T>(url: string): Promise<T> {
         return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
             .then(response => response.json())
             .catch(error => {
-
-                let errorObj = error.json();
+                let errorJson = error.json();
                         
-                if (errorObj.errorCode === 'TokenExpired') {
-                    console.log('access token is expired. refreshing...');
-                    // refresh token
-                    return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
-                        .toPromise()
-                        .then(refreshResponse => {
-                            console.log('called refresh token endpoint successfully.');
-                            let accessToken = refreshResponse.json();
-                            this.accountService.updateAccessToken(accessToken.token);
-                            console.log('refreshed token. making original call again...');
-
-                            // make request again
-                            return this._getJson(url)
-                                .then(r => r)
-                                .catch(err => this.handleError(err));
-                        })
-                        .catch(e => this.handleError(e));                    
-
+                if (errorJson && errorJson.errorCode === 'TokenExpired') {
+                    return this._refreshAccessTokenAndRetryGetJson(url)
+                        .then(innerResponse => innerResponse)
+                        .catch(innerError => this.handleError(innerError));
                 } else {
                     this.handleError(error);
                 }
@@ -118,7 +82,25 @@ export class HttpService {
         return Promise.reject(error);
     }
 
-    private announceTokenExpired(message: string) {
-        this.tokenExpiredAnnouncedSource.next(message);
+    private _retryGetJson<T>(url: string): Promise<T> {
+        return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
+            .toPromise()
+            .then(response => response.json())
+            .catch(error => this.handleError(error));
+    }
+
+    private _refreshAccessTokenAndRetryGetJson(url: string): Promise<Response> {
+        return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
+            .toPromise()
+            .then(response => {
+                let accessToken = response.json();
+                this.accountService.updateAccessToken(accessToken.token);
+
+                return this._retryGetJson(url)
+                    .then(innerResponse => innerResponse)
+                    .catch(innerError => this.handleError(innerError));                
+
+            })
+            .catch(error => this.handleError(error));
     }
 }
