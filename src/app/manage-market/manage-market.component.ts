@@ -31,7 +31,9 @@ export class ManageMarketComponent implements OnInit {
 
   viewMarket(): void {
     this.marketService.get()
-      .then(response => response)
+      .then(response => {
+        alert(response.message);
+      })
       .catch(this.handleError);
   }
 

@@ -14,6 +14,24 @@ export class HttpService {
 
     constructor(private http: Http, private accountService: AccountService) { }
 
+    private refreshAccessTokenAndTryGetAgain() {
+
+    }
+
+    private _getJson<T>(url: string): Promise<T> {
+        return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
+            .toPromise()
+            .then(response => response.json())
+            .catch(error => this.handleError(error));
+    }
+
+    private _refreshAccessTokenAndRetryGetJson<T>(url: string): Promise<T> {
+        return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
+            .toPromise()
+            .then(response => response.json())
+            .catch(error => this.handleError(error));
+    }    
+
     public getJson<T>(url: string): Promise<T> {
         return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
@@ -25,25 +43,23 @@ export class HttpService {
                 if (errorObj.errorCode === 'TokenExpired') {
                     console.log('access token is expired. refreshing...');
                     // refresh token
-                    this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
+                    return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
                         .toPromise()
                         .then(refreshResponse => {
                             console.log('called refresh token endpoint successfully.');
                             let accessToken = refreshResponse.json();
                             this.accountService.updateAccessToken(accessToken.token);
                             console.log('refreshed token. making original call again...');
-                            // make request again
-                            this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
-                                .toPromise()
-                                .then(originalResponse => {
-                                    console.log('made original call successfully');
-                                    originalResponse.json();
-                                })
-                                .catch(err => this.handleError(err));                            
 
+                            // make request again
+                            return this._getJson(url)
+                                .then(r => r)
+                                .catch(err => this.handleError(err));
                         })
                         .catch(e => this.handleError(e));                    
 
+                } else {
+                    this.handleError(error);
                 }
             });
     }
@@ -88,10 +104,6 @@ export class HttpService {
             if (errorObj.errorCode === 'MissingClaim') {
                 // show nice popup
                 alert('You do not have sufficient permission.');
-            }
-
-            if (errorObj.errorCode === 'TokenExpired') {
-                //service.announceTokenExpired(errorObj.errorCode);
             }
 
             if (errorObj.errorCode === 'MissingToken' || errorObj.errorCode === 'InvalidToken' || errorObj.errorCode === 'TokenRevoked') {
