@@ -47,11 +47,13 @@ export class ManageMarketComponent implements OnInit {
       .then(response => {
         alert(response.json().message);
       })
-      .catch(this.handleError);
+      .catch(error => {
+        this.handleError;
+      });
   }
 
-  private handleError(error: any): Promise<any> {
-    return Promise.reject(error.message || error);
+  private handleError(error: any): void {
+    console.log(error.message || error);
   }
 
   ngOnInit() {

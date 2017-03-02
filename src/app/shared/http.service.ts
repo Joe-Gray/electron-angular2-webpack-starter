@@ -16,18 +16,25 @@ export class HttpService {
     constructor(private http: Http, private accountService: AccountService) { }
 
     public get(url: string): Promise<Response> {
+        // console.log(new Error().stack);        
         return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
-            .then(response => response)
+            .then(response => {
+                return response;
+            })
             .catch(error => {
                 let errorJson = error.json();
 
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
                     return this._refreshAccessTokenAndRetryGet(url)
-                        .then(innerResponse => innerResponse)
-                        .catch(innerError => this.handleError(innerError));
+                        .then(innerResponse => {
+                            return innerResponse;
+                        })
+                        .catch(innerError => {
+                            return this.handleError(innerError);
+                        });
                 } else {
-                    this.handleError(error);
+                    return this.handleError(error);
                 }
             });
     }
@@ -44,7 +51,7 @@ export class HttpService {
                         .then(innerResponse => innerResponse)
                         .catch(innerError => this.handleError(innerError));
                 } else {
-                    this.handleError(error);
+                    return this.handleError(error);
                 }
             });
     }
@@ -61,7 +68,7 @@ export class HttpService {
                         .then(innerResponse => innerResponse)
                         .catch(innerError => this.handleError(innerError));
                 } else {
-                    this.handleError(error);
+                    return this.handleError(error);
                 }
             });
     }
@@ -77,7 +84,7 @@ export class HttpService {
     }
 
     private handleError(error: Response): Promise<Response> {
-        console.error('An error occurred', error);
+        //console.error('An error occurred', error);
 
         let errorObj = error.json();
 
@@ -95,7 +102,8 @@ export class HttpService {
 
         }
 
-        console.error('error object', error.json());
+        console.log('inside handleError');
+        //console.error('error object', errorObj);
         return Promise.reject(error);
     }
 
@@ -107,8 +115,12 @@ export class HttpService {
                 this.accountService.updateAccessToken(accessToken.token);
 
                 return this._retryGet(url)
-                    .then(innerResponse => innerResponse)
-                    .catch(innerError => this.handleError(innerError));
+                    .then(innerResponse => {
+                        return innerResponse;
+                    })
+                    .catch(innerError => {
+                        return this.handleError(innerError);
+                    });
 
             })
             .catch(error => {
@@ -116,18 +128,22 @@ export class HttpService {
 
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
                     this.announceRefreshTokenExpired('expired');
-                    this.handleError(error);
-                } else {
-                    this.handleError(error);
                 }
+
+                return this.handleError(error);
+
             });
     }
 
     private _retryGet(url: string): Promise<Response> {
         return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
-            .then(response => response)
-            .catch(error => this.handleError(error));
+            .then(response => { 
+                return response; 
+            })
+            .catch(error => { 
+                return this.handleError(error);
+            });
     }
 
     private _refreshAccessTokenAndRetryPost(url: string, data: any): Promise<Response> {

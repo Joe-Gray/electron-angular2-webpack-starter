@@ -12,8 +12,12 @@ export class MarketService {
 
   get(): Promise<Response> {
     return this.httpService.get(this.webApiUrl + '/view')
-      .then(response => response)
-      .catch(this.handleError);
+      .then(response => {
+        return response;
+      })
+      .catch(error => {
+        return this.handleError(error);
+      });
   }
 
   add(market: any): Promise<Response> {

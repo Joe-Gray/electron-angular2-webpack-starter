@@ -41,10 +41,11 @@ export class AuthenticationService {
     this.httpService.get(this.webApiUrl + '/logout')
       .then(response => {
         this.accountService.logout(response.text());
+        return response;
       })
       .catch(error => {
         this.accountService.logout('');
-        this.handleError(error);
+        return this.handleError(error);
       });
   }
 
