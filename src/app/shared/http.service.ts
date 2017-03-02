@@ -16,7 +16,7 @@ export class HttpService {
     constructor(private http: Http, private accountService: AccountService) { }
 
     public get(url: string): Promise<Response> {
-        // console.log(new Error().stack);        
+        let stack = new Error().stack;
         return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
             .then(response => {
@@ -26,20 +26,21 @@ export class HttpService {
                 let errorJson = error.json();
 
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
-                    return this._refreshAccessTokenAndRetryGet(url)
+                    return this._refreshAccessTokenAndRetryGet(url, stack)
                         .then(innerResponse => {
                             return innerResponse;
                         })
                         .catch(innerError => {
-                            return this.handleError(innerError);
+                            return this.handleError(innerError, stack);
                         });
                 } else {
-                    return this.handleError(error);
+                    return this.handleError(error, stack);
                 }
             });
     }
 
     public post(url: string, data: any): Promise<Response> {
+        let stack = new Error().stack;
         return this.http.post(url, data, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
             .then(response => response)
@@ -47,16 +48,17 @@ export class HttpService {
                 let errorJson = error.json();
 
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
-                    return this._refreshAccessTokenAndRetryPost(url, data)
+                    return this._refreshAccessTokenAndRetryPost(url, data, stack)
                         .then(innerResponse => innerResponse)
-                        .catch(innerError => this.handleError(innerError));
+                        .catch(innerError => this.handleError(innerError, stack));
                 } else {
-                    return this.handleError(error);
+                    return this.handleError(error, stack);
                 }
             });
     }
 
     public delete(url: string): Promise<Response> {
+        let stack = new Error().stack;
         return this.http.delete(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
             .then(response => response)
@@ -64,11 +66,11 @@ export class HttpService {
                 let errorJson = error.json();
 
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
-                    return this._refreshAccessTokenAndRetryDelete(url)
+                    return this._refreshAccessTokenAndRetryDelete(url, stack)
                         .then(innerResponse => innerResponse)
-                        .catch(innerError => this.handleError(innerError));
+                        .catch(innerError => this.handleError(innerError, stack));
                 } else {
-                    return this.handleError(error);
+                    return this.handleError(error, stack);
                 }
             });
     }
@@ -83,8 +85,8 @@ export class HttpService {
         );
     }
 
-    private handleError(error: Response): Promise<Response> {
-        //console.error('An error occurred', error);
+    private handleError(error: Response, stack: string): Promise<Response> {
+        console.error('An error occurred', error, stack);
 
         let errorObj = error.json();
 
@@ -102,24 +104,22 @@ export class HttpService {
 
         }
 
-        console.log('inside handleError');
-        //console.error('error object', errorObj);
         return Promise.reject(error);
     }
 
-    private _refreshAccessTokenAndRetryGet(url: string): Promise<Response> {
+    private _refreshAccessTokenAndRetryGet(url: string, stack: string): Promise<Response> {
         return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
             .toPromise()
             .then(response => {
                 let accessToken = response.json();
                 this.accountService.updateAccessToken(accessToken.token);
 
-                return this._retryGet(url)
+                return this._retryGet(url, stack)
                     .then(innerResponse => {
                         return innerResponse;
                     })
                     .catch(innerError => {
-                        return this.handleError(innerError);
+                        return this.handleError(innerError, stack);
                     });
 
             })
@@ -130,64 +130,64 @@ export class HttpService {
                     this.announceRefreshTokenExpired('expired');
                 }
 
-                return this.handleError(error);
+                return this.handleError(error, stack);
 
             });
     }
 
-    private _retryGet(url: string): Promise<Response> {
+    private _retryGet(url: string, stack: string): Promise<Response> {
         return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
-            .then(response => { 
-                return response; 
+            .then(response => {
+                return response;
             })
-            .catch(error => { 
-                return this.handleError(error);
+            .catch(error => {
+                return this.handleError(error, stack);
             });
     }
 
-    private _refreshAccessTokenAndRetryPost(url: string, data: any): Promise<Response> {
+    private _refreshAccessTokenAndRetryPost(url: string, data: any, stack: string): Promise<Response> {
         return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
             .toPromise()
             .then(response => {
                 let accessToken = response.json();
                 this.accountService.updateAccessToken(accessToken.token);
 
-                return this._retryPost(url, data)
+                return this._retryPost(url, data, stack)
                     .then(innerResponse => innerResponse)
-                    .catch(innerError => this.handleError(innerError));
+                    .catch(innerError => this.handleError(innerError, stack));
 
             })
-            .catch(error => this.handleError(error));
+            .catch(error => this.handleError(error, stack));
     }
 
-    private _retryPost(url: string, data: any): Promise<Response> {
+    private _retryPost(url: string, data: any, stack: string): Promise<Response> {
         return this.http.post(url, data, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
             .then(response => response)
-            .catch(error => this.handleError(error));
+            .catch(error => this.handleError(error, stack));
     }
 
-    private _refreshAccessTokenAndRetryDelete(url: string): Promise<Response> {
+    private _refreshAccessTokenAndRetryDelete(url: string, stack: string): Promise<Response> {
         return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
             .toPromise()
             .then(response => {
                 let accessToken = response.json();
                 this.accountService.updateAccessToken(accessToken.token);
 
-                return this._retryDelete(url)
+                return this._retryDelete(url, stack)
                     .then(innerResponse => innerResponse)
-                    .catch(innerError => this.handleError(innerError));
+                    .catch(innerError => this.handleError(innerError, stack));
 
             })
-            .catch(error => this.handleError(error));
+            .catch(error => this.handleError(error, stack));
     }
 
-    private _retryDelete(url: string): Promise<Response> {
+    private _retryDelete(url: string, stack: string): Promise<Response> {
         return this.http.delete(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
             .then(response => response)
-            .catch(error => this.handleError(error));
+            .catch(error => this.handleError(error, stack));
     }
 
     private announceRefreshTokenExpired(message: string) {

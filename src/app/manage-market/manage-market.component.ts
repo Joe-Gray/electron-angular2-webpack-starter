@@ -48,7 +48,7 @@ export class ManageMarketComponent implements OnInit {
         alert(response.json().message);
       })
       .catch(error => {
-        this.handleError;
+        this.handleError(error);
       });
   }
 
