@@ -1,12 +1,39 @@
 <header>
-  <nav>
+<!--  <nav>
     <a [routerLink]="['']">Home</a>
     <a [routerLink]="['manage-market']" *ngIf="hasAnyMarketClaim">Manage Market</a>
     <a [routerLink]="['admin']" *ngIf="hasAdminClaim">Admin</a>
     <a [routerLink]="['settings']" *ngIf="userIsLoggedIn">Settings</a>
     <a [routerLink]="['login']" *ngIf="!userIsLoggedIn">Login</a>
     <a [routerLink]="['']" *ngIf="userIsLoggedIn" (click)="logout()">Logout {{userEmail}}</a>
-  </nav>
+  </nav>-->
+
+<ul class="nav nav-pills">
+<!--  <li class="nav-item">
+    <a class="nav-link active" href="#">Active</a>
+  </li>-->
+  <li class="nav-item">
+    <a class="nav-link" [routerLink]="['']">Home</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" [routerLink]="['manage-market']" *ngIf="hasAnyMarketClaim">Manage Market</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" [routerLink]="['admin']" *ngIf="hasAdminClaim">Admin</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" [routerLink]="['settings']" *ngIf="userIsLoggedIn">Settings</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" [routerLink]="['login']" *ngIf="!userIsLoggedIn">Login</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" [routerLink]="['']" *ngIf="userIsLoggedIn" (click)="logout()">Logout {{userEmail}}</a>
+  </li>    
+<!--  <li class="nav-item">
+    <a class="nav-link disabled" href="#">Disabled</a>
+  </li>-->
+</ul>  
 </header>
 <main>
   <router-outlet></router-outlet>
