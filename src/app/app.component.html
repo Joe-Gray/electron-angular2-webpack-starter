@@ -1,17 +1,5 @@
 <header>
-<!--  <nav>
-    <a [routerLink]="['']">Home</a>
-    <a [routerLink]="['manage-market']" *ngIf="hasAnyMarketClaim">Manage Market</a>
-    <a [routerLink]="['admin']" *ngIf="hasAdminClaim">Admin</a>
-    <a [routerLink]="['settings']" *ngIf="userIsLoggedIn">Settings</a>
-    <a [routerLink]="['login']" *ngIf="!userIsLoggedIn">Login</a>
-    <a [routerLink]="['']" *ngIf="userIsLoggedIn" (click)="logout()">Logout {{userEmail}}</a>
-  </nav>-->
-
-<ul class="nav nav-pills">
-<!--  <li class="nav-item">
-    <a class="nav-link active" href="#">Active</a>
-  </li>-->
+<ul class="nav">
   <li class="nav-item">
     <a class="nav-link" [routerLink]="['']">Home</a>
   </li>  
@@ -29,10 +17,7 @@
   </li>
   <li class="nav-item">
     <a class="nav-link" [routerLink]="['']" *ngIf="userIsLoggedIn" (click)="logout()">Logout {{userEmail}}</a>
-  </li>    
-<!--  <li class="nav-item">
-    <a class="nav-link disabled" href="#">Disabled</a>
-  </li>-->
+  </li>
 </ul>  
 </header>
 <main>

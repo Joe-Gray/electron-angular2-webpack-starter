@@ -63,7 +63,7 @@ export class ManageMarketComponent implements OnInit {
   private showDialog(message: string) {
     const modalRef = this.modalService.open(DialogComponent);
     modalRef.componentInstance.title = 'Manage Market';
-    modalRef.componentInstance.message = message;    
+    modalRef.componentInstance.message = message;
   }
 
   ngOnInit() {
