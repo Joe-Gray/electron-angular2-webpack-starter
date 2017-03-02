@@ -3,6 +3,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { HttpModule } from '@angular/http';
 import { FormsModule } from '@angular/forms';
 import { CustomFormsModule } from '../../node_modules/ng2-validation';
+import { NgbModule } from '../../node_modules/@ng-bootstrap/ng-bootstrap';
 
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
@@ -18,6 +19,7 @@ import { HttpService } from './shared/services/http.service';
 import { AccountService } from './shared/services/account.service';
 import { MarketService } from './shared/services/market.service';
 import { AuthenticationService } from './shared/services/authentication.service';
+import { DialogComponent } from './shared/components/dialog.component';
 
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
 
@@ -27,7 +29,8 @@ import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
     HttpModule,
     FormsModule,
     CustomFormsModule,
-    routing
+    routing,
+    NgbModule.forRoot(),
   ],
   declarations: [
     AppComponent,
@@ -35,7 +38,8 @@ import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
     AdminComponent,
     ManageMarketComponent,
     SettingsComponent,
-    LoginComponent
+    LoginComponent,
+    DialogComponent
   ],
   providers: [
     ApiService,
@@ -44,6 +48,7 @@ import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
     MarketService,
     AuthenticationService
   ],
+  entryComponents: [DialogComponent],
   bootstrap: [AppComponent]
 })
 export class AppModule {

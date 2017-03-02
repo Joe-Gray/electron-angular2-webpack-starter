@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Response } from '@angular/http';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AccountService } from '../shared/services/account.service';
 import { MarketService } from '../shared/services/market.service';
+import { DialogComponent } from '../shared/components/dialog.component';
 
 @Component({
   selector: 'me-manage-market',
@@ -15,37 +17,39 @@ export class ManageMarketComponent implements OnInit {
   hasEditMarketClaim = false;
   hasViewMarketClaim = false;
 
-  constructor(private marketService: MarketService,
-    private accountService: AccountService) {}
+  constructor(
+    private marketService: MarketService,
+    private accountService: AccountService,
+    private modalService: NgbModal) {}
 
-  addMarket(): void {
+  public addMarket(): void {
     this.marketService.add('')
       .then(response => {
-        alert(response.json().message);
+        this.showDialog(response.json().message);
       })
       .catch(this.handleError);
   }
 
-  editMarket(): void {
+  public editMarket(): void {
     this.marketService.edit('')
       .then(response => {
-        alert(response.json().message);
+        this.showDialog(response.json().message);
       })
       .catch(this.handleError);
   }
 
-  deleteMarket(): void {
+  public deleteMarket(): void {
     this.marketService.delete('')
       .then(response => {
-        alert(response.json().message);
+        this.showDialog(response.json().message);
       })
       .catch(this.handleError);
   }
 
-  viewMarket(): void {
+  public viewMarket(): void {
     this.marketService.get()
       .then(response => {
-        alert(response.json().message);
+        this.showDialog(response.json().message);
       })
       .catch(error => {
         this.handleError(error);
@@ -54,6 +58,12 @@ export class ManageMarketComponent implements OnInit {
 
   private handleError(error: any): void {
     console.log(error.message || error);
+  }
+
+  private showDialog(message: string) {
+    const modalRef = this.modalService.open(DialogComponent);
+    modalRef.componentInstance.title = 'Manage Market';
+    modalRef.componentInstance.message = message;    
   }
 
   ngOnInit() {
