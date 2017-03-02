@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthenticationService } from '../shared/authentication.service';
-import { UserCredentials } from '../shared/user-credentials';
+import { AuthenticationService } from '../shared/services/authentication.service';
+import { UserCredentials } from '../shared/models/user-credentials';
 
 @Component({
   selector: 'me-login',

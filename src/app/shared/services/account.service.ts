@@ -4,9 +4,9 @@ import { Subject }    from 'rxjs/Subject';
 import * as jwt_decode from 'jwt-decode';
 import * as angular_jwt from 'angular2-jwt';
 import { HttpService } from './http.service';
-import { LoginTokens } from './login-tokens';
-import { UserCredentials } from './user-credentials';
-import { JwtPayload } from './jwt-payload';
+import { LoginTokens } from '../models/login-tokens';
+import { UserCredentials } from '../models/user-credentials';
+import { JwtPayload } from '../models/jwt-payload';
 
 @Injectable()
 export class AccountService {

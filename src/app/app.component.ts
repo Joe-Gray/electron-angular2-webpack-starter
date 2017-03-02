@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiService } from './shared';
-import { AccountService } from './shared/account.service';
-import { AuthenticationService } from './shared/authentication.service';
+import { ApiService } from './shared/services/api.service';
+import { AccountService } from './shared/services/account.service';
+import { AuthenticationService } from './shared/services/authentication.service';
 import '../style/app.scss';
 
 @Component({

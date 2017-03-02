@@ -13,11 +13,11 @@ import { ManageMarketComponent } from './manage-market/manage-market.component';
 import { SettingsComponent } from './settings/settings.component';
 import { LoginComponent } from './login/login.component';
 
-import { ApiService } from './shared';
-import { HttpService } from './shared';
-import { AccountService } from './shared';
-import { MarketService } from './shared';
-import { AuthenticationService } from './shared';
+import { ApiService } from './shared/services/api.service';
+import { HttpService } from './shared/services/http.service';
+import { AccountService } from './shared/services/account.service';
+import { MarketService } from './shared/services/market.service';
+import { AuthenticationService } from './shared/services/authentication.service';
 
 import { removeNgStyles, createNewHosts } from '@angularclass/hmr';
 

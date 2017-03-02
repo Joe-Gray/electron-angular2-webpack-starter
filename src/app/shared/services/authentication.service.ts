@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpService } from './http.service';
-import { LoginTokens } from './login-tokens';
-import { UserCredentials } from './user-credentials';
+import { LoginTokens } from '../models/login-tokens';
+import { UserCredentials } from '../models/user-credentials';
 import { AccountService } from './account.service';
 
 @Injectable()

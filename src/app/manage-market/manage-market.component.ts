@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Response } from '@angular/http';
-import { AccountService } from '../shared/account.service';
-import { MarketService } from '../shared/market.service';
+import { AccountService } from '../shared/services/account.service';
+import { MarketService } from '../shared/services/market.service';
 
 @Component({
   selector: 'me-manage-market',
