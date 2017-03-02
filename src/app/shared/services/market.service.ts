@@ -10,7 +10,7 @@ export class MarketService {
   constructor(private httpService: HttpService) {
   }
 
-  get(): Promise<Response> {
+  public get(): Promise<Response> {
     return this.httpService.get(this.webApiUrl + '/view')
       .then(response => {
         return response;
@@ -20,19 +20,19 @@ export class MarketService {
       });
   }
 
-  add(market: any): Promise<Response> {
+  public add(market: any): Promise<Response> {
     return this.httpService.post(this.webApiUrl + '/add', market)
       .then(response => response)
       .catch(this.handleError);
   }
 
-  edit(market: any): Promise<Response> {
+  public edit(market: any): Promise<Response> {
     return this.httpService.post(this.webApiUrl + '/edit', market)
       .then(response => response)
       .catch(this.handleError);
   }
 
-  delete(market: any): Promise<Response> {
+  public delete(market: any): Promise<Response> {
     return this.httpService.delete(this.webApiUrl + '/delete')
       .then(response => response)
       .catch(this.handleError);

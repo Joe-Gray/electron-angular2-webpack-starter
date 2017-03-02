@@ -2,18 +2,20 @@ import { Injectable } from '@angular/core';
 import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { Subject }    from 'rxjs/Subject';
 import 'rxjs/add/operator/toPromise';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AccountService } from './account.service';
+import { DialogComponent } from '../components/dialog.component';
 
 @Injectable()
 export class HttpService {
-
     private urlToRefreshToken = 'https://localhost:44372/api/accounts/getAccessToken';
-
     private refreshTokenExpiredAnnouncedSource = new Subject<string>();
-
     public refreshTokenExpiredAnnounced$ = this.refreshTokenExpiredAnnouncedSource.asObservable();
 
-    constructor(private http: Http, private accountService: AccountService) { }
+    constructor(
+        private http: Http,
+        private accountService: AccountService,
+        private modalService: NgbModal) { }
 
     public get(url: string): Promise<Response> {
         let stack = new Error().stack;
@@ -26,7 +28,7 @@ export class HttpService {
                 let errorJson = error.json();
 
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
-                    return this._refreshAccessTokenAndRetryGet(url, stack)
+                    return this.refreshAccessTokenAndRetryGet(url, stack)
                         .then(innerResponse => {
                             return innerResponse;
                         })
@@ -48,7 +50,7 @@ export class HttpService {
                 let errorJson = error.json();
 
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
-                    return this._refreshAccessTokenAndRetryPost(url, data, stack)
+                    return this.refreshAccessTokenAndRetryPost(url, data, stack)
                         .then(innerResponse => innerResponse)
                         .catch(innerError => this.handleError(innerError, stack));
                 } else {
@@ -66,7 +68,7 @@ export class HttpService {
                 let errorJson = error.json();
 
                 if (errorJson && errorJson.errorCode === 'TokenExpired') {
-                    return this._refreshAccessTokenAndRetryDelete(url, stack)
+                    return this.refreshAccessTokenAndRetryDelete(url, stack)
                         .then(innerResponse => innerResponse)
                         .catch(innerError => this.handleError(innerError, stack));
                 } else {
@@ -92,8 +94,9 @@ export class HttpService {
 
         if (errorObj.errorCode) {
             if (errorObj.errorCode === 'MissingClaim') {
-                // show nice popup
-                alert('You do not have sufficient permission.');
+                const modalRef = this.modalService.open(DialogComponent);
+                modalRef.componentInstance.title = 'Not Authorized';
+                modalRef.componentInstance.message = 'You do not have sufficient permission.';
             }
 
             if (errorObj.errorCode === 'MissingToken' || errorObj.errorCode === 'InvalidToken' || errorObj.errorCode === 'TokenRevoked') {
@@ -107,14 +110,14 @@ export class HttpService {
         return Promise.reject(error);
     }
 
-    private _refreshAccessTokenAndRetryGet(url: string, stack: string): Promise<Response> {
+    private refreshAccessTokenAndRetryGet(url: string, stack: string): Promise<Response> {
         return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
             .toPromise()
             .then(response => {
                 let accessToken = response.json();
                 this.accountService.updateAccessToken(accessToken.token);
 
-                return this._retryGet(url, stack)
+                return this.retryGet(url, stack)
                     .then(innerResponse => {
                         return innerResponse;
                     })
@@ -135,7 +138,7 @@ export class HttpService {
             });
     }
 
-    private _retryGet(url: string, stack: string): Promise<Response> {
+    private retryGet(url: string, stack: string): Promise<Response> {
         return this.http.get(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
             .then(response => {
@@ -146,14 +149,14 @@ export class HttpService {
             });
     }
 
-    private _refreshAccessTokenAndRetryPost(url: string, data: any, stack: string): Promise<Response> {
+    private refreshAccessTokenAndRetryPost(url: string, data: any, stack: string): Promise<Response> {
         return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
             .toPromise()
             .then(response => {
                 let accessToken = response.json();
                 this.accountService.updateAccessToken(accessToken.token);
 
-                return this._retryPost(url, data, stack)
+                return this.retryPost(url, data, stack)
                     .then(innerResponse => innerResponse)
                     .catch(innerError => this.handleError(innerError, stack));
 
@@ -161,21 +164,21 @@ export class HttpService {
             .catch(error => this.handleError(error, stack));
     }
 
-    private _retryPost(url: string, data: any, stack: string): Promise<Response> {
+    private retryPost(url: string, data: any, stack: string): Promise<Response> {
         return this.http.post(url, data, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
             .then(response => response)
             .catch(error => this.handleError(error, stack));
     }
 
-    private _refreshAccessTokenAndRetryDelete(url: string, stack: string): Promise<Response> {
+    private refreshAccessTokenAndRetryDelete(url: string, stack: string): Promise<Response> {
         return this.http.get(this.urlToRefreshToken, { headers: this.getStandardHeaders('refreshToken') })
             .toPromise()
             .then(response => {
                 let accessToken = response.json();
                 this.accountService.updateAccessToken(accessToken.token);
 
-                return this._retryDelete(url, stack)
+                return this.retryDelete(url, stack)
                     .then(innerResponse => innerResponse)
                     .catch(innerError => this.handleError(innerError, stack));
 
@@ -183,7 +186,7 @@ export class HttpService {
             .catch(error => this.handleError(error, stack));
     }
 
-    private _retryDelete(url: string, stack: string): Promise<Response> {
+    private retryDelete(url: string, stack: string): Promise<Response> {
         return this.http.delete(url, { headers: this.getStandardHeaders('accessToken') })
             .toPromise()
             .then(response => response)
