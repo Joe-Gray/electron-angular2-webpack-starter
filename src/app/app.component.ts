@@ -32,6 +32,10 @@ export class AppComponent {
     this.setFooterInfo();
   }
 
+  public logout(): void {
+    this.authenticationService.logout();
+  }
+
   private subscribeToAnnouncements(): void {
     this.accountService.loginAnnounced$.subscribe(message => {
       this.userIsLoggedIn = true;
@@ -65,10 +69,6 @@ export class AppComponent {
       this.hasAnyMarketClaim = this.accountService.accessTokenPayload.userSecurityClaims.some((ele) => {
         return this.accountService.marketClaims.includes(ele);
       });
-  }
-
-  private logout(): void {
-    this.authenticationService.logout();
   }
 
   private setFooterInfo(): void {

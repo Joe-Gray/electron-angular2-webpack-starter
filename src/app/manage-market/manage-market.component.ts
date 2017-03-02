@@ -12,15 +12,23 @@ import { DialogComponent } from '../shared/components/dialog.component';
 })
 export class ManageMarketComponent implements OnInit {
 
-  hasAddMarketClaim = false;
-  hasDeleteMarketClaim = false;
-  hasEditMarketClaim = false;
-  hasViewMarketClaim = false;
+  public hasAddMarketClaim = false;
+  public hasDeleteMarketClaim = false;
+  public hasEditMarketClaim = false;
+  public hasViewMarketClaim = false;
 
   constructor(
     private marketService: MarketService,
     private accountService: AccountService,
     private modalService: NgbModal) {}
+
+  ngOnInit() {
+    let accessPayload = this.accountService.accessTokenPayload;
+    this.hasAddMarketClaim = this.accountService.accessTokenPayload.userSecurityClaims.includes('AddMarket');
+    this.hasDeleteMarketClaim = this.accountService.accessTokenPayload.userSecurityClaims.includes('DeleteMarket');
+    this.hasEditMarketClaim = this.accountService.accessTokenPayload.userSecurityClaims.includes('EditMarket');
+    this.hasViewMarketClaim = this.accountService.accessTokenPayload.userSecurityClaims.includes('ViewMarket');
+  }
 
   public addMarket(): void {
     this.marketService.add('')
@@ -64,13 +72,5 @@ export class ManageMarketComponent implements OnInit {
     const modalRef = this.modalService.open(DialogComponent);
     modalRef.componentInstance.title = 'Manage Market';
     modalRef.componentInstance.message = message;
-  }
-
-  ngOnInit() {
-    let accessPayload = this.accountService.accessTokenPayload;
-    this.hasAddMarketClaim = true; // this.accountService.accessTokenPayload.userSecurityClaims.includes('AddMarket');
-    this.hasDeleteMarketClaim = true; // this.accountService.accessTokenPayload.userSecurityClaims.includes('DeleteMarket');
-    this.hasEditMarketClaim = true; // this.accountService.accessTokenPayload.userSecurityClaims.includes('EditMarket');
-    this.hasViewMarketClaim = true; // this.accountService.accessTokenPayload.userSecurityClaims.includes('ViewMarket');
   }
 }

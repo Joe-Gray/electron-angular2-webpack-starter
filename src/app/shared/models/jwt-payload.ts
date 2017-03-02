@@ -1,5 +1,4 @@
-export class JwtPayload
-{
+export class JwtPayload {
 	public iss: string;
 	public sub: string;
 	public aud: string;

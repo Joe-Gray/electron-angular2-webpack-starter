@@ -10,14 +10,13 @@ export class AuthenticationService {
   private webApiUrl = 'https://localhost:44372/api/accounts';
 
   constructor(private httpService: HttpService, private accountService: AccountService) {
-
     this.httpService.refreshTokenExpiredAnnounced$.subscribe(message => {
       this.logout();
     });
 
   }
 
-  register(userCredentials: UserCredentials): Promise<LoginTokens> {
+  public register(userCredentials: UserCredentials): Promise<LoginTokens> {
     return this.httpService.post(this.webApiUrl + '/register', userCredentials)
       .then(response => {
         let loginTokens = response.json();
@@ -27,7 +26,7 @@ export class AuthenticationService {
       .catch(this.handleError);
   }
 
-  login(userCredentials: UserCredentials): Promise<LoginTokens> {
+  public login(userCredentials: UserCredentials): Promise<LoginTokens> {
     return this.httpService.post(this.webApiUrl + '/login', userCredentials)
       .then(response => {
         let loginTokens = response.json();
@@ -37,7 +36,7 @@ export class AuthenticationService {
       .catch(this.handleError);
   }
 
-  logout(): void {
+  public logout(): void {
     this.httpService.get(this.webApiUrl + '/logout')
       .then(response => {
         this.accountService.logout(response.text());
@@ -49,7 +48,7 @@ export class AuthenticationService {
       });
   }
 
-  getAccessToken(): Promise<LoginTokens> {
+  public getAccessToken(): Promise<LoginTokens> {
     return this.httpService.get(this.webApiUrl + '/getAccessToken')
       .then(response => {
         let loginTokens = response.json();

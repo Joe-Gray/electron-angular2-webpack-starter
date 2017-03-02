@@ -94,15 +94,16 @@ export class HttpService {
 
         if (errorObj.errorCode) {
             if (errorObj.errorCode === 'MissingClaim') {
-                const modalRef = this.modalService.open(DialogComponent);
+                let modalRef = this.modalService.open(DialogComponent);
                 modalRef.componentInstance.title = 'Not Authorized';
                 modalRef.componentInstance.message = 'You do not have sufficient permission.';
             }
 
             if (errorObj.errorCode === 'MissingToken' || errorObj.errorCode === 'InvalidToken' || errorObj.errorCode === 'TokenRevoked') {
-                // run logout logic to wipe out tokens in localStorage
-                // alert user that they need to login
-                // navigate to login page
+                let modalRef = this.modalService.open(DialogComponent);
+                modalRef.componentInstance.title = 'Authentication Problem';
+                modalRef.componentInstance.message = 'You will need to login again.';
+                this.announceRefreshTokenExpired('expired');
             }
 
         }

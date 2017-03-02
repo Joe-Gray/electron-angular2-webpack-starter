@@ -10,8 +10,8 @@ import { UserCredentials } from '../shared/models/user-credentials';
 })
 export class LoginComponent implements OnInit {
 
-  userCredentials: UserCredentials;
-  fieldWithFocus: any;
+  public userCredentials: UserCredentials;
+  public fieldWithFocus: any;
 
   constructor(private authenticationService: AuthenticationService, private router: Router) {
     this.userCredentials = new UserCredentials();
@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
   }
 
-  register(): void {
+  public register(): void {
     this.authenticationService
       .register(this.userCredentials)
       .then(loginTokens => {
@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  login(): void {
+  public login(): void {
     this.authenticationService
       .login(this.userCredentials)
       .then(loginTokens => {
@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  setFieldWithFocus(e): void {
+  public setFieldWithFocus(e): void {
     this.fieldWithFocus = e.target.name;
   }
 

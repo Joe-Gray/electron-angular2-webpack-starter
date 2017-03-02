@@ -12,6 +12,6 @@ export class DialogComponent implements OnInit {
 
   constructor(public activeModal: NgbActiveModal) {}
 
-  ngOnInit() {  }
+  ngOnInit() {}
 
 }
