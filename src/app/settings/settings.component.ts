@@ -4,7 +4,7 @@ import { remote } from 'electron';
 @Component({
   selector: 'me-settings',
   templateUrl: './settings.component.html',
-  styleUrls: ['./settings.component.css']
+  styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
 

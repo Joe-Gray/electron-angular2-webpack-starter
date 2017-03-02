@@ -8,7 +8,7 @@ import { DialogComponent } from '../shared/components/dialog.component';
 @Component({
   selector: 'me-manage-market',
   templateUrl: './manage-market.component.html',
-  styleUrls: ['./manage-market.component.css']
+  styleUrls: ['./manage-market.component.scss']
 })
 export class ManageMarketComponent implements OnInit {
 

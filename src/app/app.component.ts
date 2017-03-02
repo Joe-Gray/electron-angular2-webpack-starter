@@ -11,16 +11,14 @@ import '../style/app.scss';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-
-  url = 'https://github.com/preboot/angular2-webpack';
-  title: string;
-  nodeVersion: string;
-  chromeVersion: string;
-  electronVersion: string;
-  userIsLoggedIn = false;
-  userEmail: string;
-  hasAdminClaim = false;
-  hasAnyMarketClaim = false;
+  public title: string;
+  public nodeVersion: string;
+  public chromeVersion: string;
+  public electronVersion: string;
+  public userIsLoggedIn = false;
+  public userEmail: string;
+  public hasAdminClaim = false;
+  public hasAnyMarketClaim = false;
 
   constructor(
     private api: ApiService,
@@ -28,6 +26,13 @@ export class AppComponent {
     private authenticationService: AuthenticationService,
     private router: Router) {
 
+    this.title = this.api.title;
+    this.subscribeToAnnouncements();
+    this.initializeCurrentAccount();
+    this.setFooterInfo();
+  }
+
+  private subscribeToAnnouncements(): void {
     this.accountService.loginAnnounced$.subscribe(message => {
       this.userIsLoggedIn = true;
       this.setupLoggedInUser();
@@ -40,24 +45,21 @@ export class AppComponent {
       this.hasAnyMarketClaim = false;
       this.router.navigate(['login']);
     });
+  }
 
-    if (accountService.isRefreshTokenExpired()) {
+  private initializeCurrentAccount(): void {
+    if (this.accountService.isRefreshTokenExpired()) {
       this.logout();
     }
 
-    this.userIsLoggedIn = accountService.isUserLoggedIn;
+    this.userIsLoggedIn = this.accountService.isUserLoggedIn;
 
     if (this.userIsLoggedIn) {
       this.setupLoggedInUser();
     }
-
-    this.title = this.api.title;
-    this.nodeVersion = this .api.nodeVersion;
-    this.chromeVersion = this.api.chromeVersion;
-    this.electronVersion = this.api.electronVersion;
   }
 
-  setupLoggedInUser(): void {
+  private setupLoggedInUser(): void {
       this.userEmail = this.accountService.accessTokenPayload.userEmail;
       this.hasAdminClaim = this.accountService.accessTokenPayload.userSecurityClaims.includes('Admin');
       this.hasAnyMarketClaim = this.accountService.accessTokenPayload.userSecurityClaims.some((ele) => {
@@ -65,7 +67,13 @@ export class AppComponent {
       });
   }
 
-  logout(): void {
+  private logout(): void {
     this.authenticationService.logout();
+  }
+
+  private setFooterInfo(): void {
+    this.nodeVersion = this .api.nodeVersion;
+    this.chromeVersion = this.api.chromeVersion;
+    this.electronVersion = this.api.electronVersion;
   }
 }
